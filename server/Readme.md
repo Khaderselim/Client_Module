@@ -25,7 +25,7 @@ This command builds the Docker image and starts the application using Docker Com
 
 ## Repository Structure
 
-- `Web-scraping/Web-driver-solution/`: Contains the web scraping solution using a web driver.
+- `server/`: Contains the web scraping solution using a web driver.
 - `Dockerfile`: The Dockerfile used to build the Docker image for the project.
 - `docker-compose.yml`: The Docker Compose file used to build and run the Docker container.
 
