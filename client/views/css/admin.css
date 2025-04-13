@@ -1,0 +1,91 @@
+.competitors-container {
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.competitor-inputs {
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+.competitor-inputs .form-group {
+    margin-bottom: 0;
+}
+
+.competitor-inputs label {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.add-competitor {
+    margin-top: 10px;
+}
+
+.remove-competitor {
+    margin-top: 25px;
+}
+
+.competitor-list {
+    margin-bottom: 15px;
+}
+.target-websites-list {
+    margin-top: 10px;
+}
+
+.target-websites-list table {
+    margin: 0;
+    background: #f8f8f8;
+}
+.competitors-inline-list table {
+    margin: 0;
+    background: #fff;
+}
+
+.competitors-inline-list .label {
+    display: inline-block;
+    min-width: 25px;
+    text-align: center;
+}
+.competitors-inline {
+    line-height: 2;
+}
+
+.competitor-tag {
+    display: inline-block;
+    margin: 2px 0;
+}
+
+.competitor-tag .label {
+    display: inline-block;
+    min-width: 25px;
+    margin-right: 5px;
+    text-align: center;
+}
+
+.competitor-tag a {
+    color: #666;
+    text-decoration: none;
+}
+
+.competitor-tag a:hover {
+    text-decoration: underline;
+}
+.less-width-label .control-label {
+    padding-left: 0;
+    width: 150px !important;
+}
+
+.less-width-label .col-lg-9 {
+    width: calc(100% - 150px);
+}
+
+/* Add to modules/client/views/css/admin.css */
+.competitor-hidden {
+    display: none;
+}
+
+.expand-all-btn {
+    cursor: pointer;
+}

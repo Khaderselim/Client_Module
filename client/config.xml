@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>client</name>
+	<displayName><![CDATA[Competitor]]></displayName>
+	<version><![CDATA[1.0.0]]></version>
+	<description><![CDATA[Tracking similar products]]></description>
+	<author><![CDATA[Mohamed Selim Khader]]></author>
+	<tab><![CDATA[administration]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+</module>
