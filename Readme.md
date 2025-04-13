@@ -37,7 +37,7 @@ For a smooth and quick installation, we recommend running the API using **Docker
 ### Steps
 
 1. **Download the `server` folder** from the repository:
-    - [Insert your repo link or specific download instructions here]
+    - [here](https://github.com/Khaderselim/Client_Module.git)
 
 2. **Open a terminal** in the project folder (where the `docker-compose.yml` file is located), then run:
 
@@ -96,7 +96,7 @@ If you prefer a GUI, you can use **Docker Desktop** to:
 ### Step 1: Download the Module
 
 - Download the `client` folder from the repository:
-    - [Insert your repository link here]
+    - [here](https://github.com/Khaderselim/Client_Module.git)
 
 ---
 
