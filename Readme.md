@@ -157,6 +157,7 @@ Use one of the following tools to connect:
 - **phpMyAdmin** (typically included with Laragon/XAMPP)
 - **MySQL Workbench**
 - **Database tools in your IDE** (e.g., VS Code, PhpStorm, etc.)
+- **etc**
 
 ---
 
