@@ -152,12 +152,12 @@ C:/laragon/www/prestashop/modules
 
 ### Step 1: Connect to the PrestaShop Database
 
-Use one of the following tools to connect:
+Use one of the following tools or any other MySQL-compatible tool to connect :
 
 - **phpMyAdmin** (typically included with Laragon/XAMPP)
 - **MySQL Workbench**
 - **Database tools in your IDE** (e.g., VS Code, PhpStorm, etc.)
-- **etc**
+
 
 ---
 
