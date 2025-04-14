@@ -10,6 +10,15 @@ Data extraction is powered by a Python-based API running in a Dockerized server 
 ---
 
 # Getting Started
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Prerequisites](#prerequisites)
+3. [Installation](#installation)
+   - [API Setup with Docker](#-1-api-setup-with-docker)
+   - [Module Installation in PrestaShop](#-2-module-installation-in-prestashop)
+   - [Insert Your Product Table in the Database](#-3-insert-your-product-table-in-the-database) 
+4. [Start Tracking Products](#-4-start-tracking-products)
 
 ## Overview
 
