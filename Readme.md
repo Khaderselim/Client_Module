@@ -274,5 +274,5 @@ foreach ($products as $product) {
 ---
 
 ![ClientModule](https://github.com/user-attachments/assets/e665480e-5479-40d2-90c1-3f57aac1908f)
-```
+
 
