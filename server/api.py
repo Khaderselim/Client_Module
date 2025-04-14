@@ -85,7 +85,7 @@ def extract_price():
     """
     try:
         url = request.args.get('url') # Get URL from request
-        param = request.args.get('param') # Get param from request
+        param = request.args.get('param') # Get price_param from request
         descr_param = request.args.get('descr_param') # Get descr_param from request
         stock_param = request.args.get('stock_param') or None # Get stock_param from request or None if not provided
         # Validate URL
