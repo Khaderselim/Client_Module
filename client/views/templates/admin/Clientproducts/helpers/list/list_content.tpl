@@ -20,6 +20,7 @@ The competitors' section can be expanded to show more competitors. ( Only shows 
                     <th>Change</th>
                     <th>Status</th>
                     <th>Difference</th>
+                    <th>Update</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -67,7 +68,7 @@ The competitors' section can be expanded to show more competitors. ( Only shows 
 
                                 </td>
                                 <td>{if isset($competitor.stock) && $competitor.stock != ''}
-                                        <span >{$competitor.stock}</span>
+                                        <span >{$competitor.stock|escape:'html':'UTF-8'}</span>
                                     {else}
                                         <span class="label label-danger">N/A</span>
                                     {/if}
@@ -82,6 +83,7 @@ The competitors' section can be expanded to show more competitors. ( Only shows 
                                         <span class="label label-default">N/A</span>
                                     {/if}
                                 </td>
+                                <td class="fixed-width-lg">{$competitor.date_add|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">
                                     {if $activeCount == 1 && $competitors|@count > 1}
                                         <button class="show-more-btn" data-product-id="{$product_id}">

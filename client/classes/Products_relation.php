@@ -30,7 +30,7 @@ class Products_relation extends ObjectModel {
      * @return array An array of product relations.
      */
     public static function getProductRelations($id_product_client) {
-        $sql = 'SELECT r.*, cp.name, cp.url, cp.price, co.priority, co.logo, co.active, cp.id_product, cph.new_price, cph.old_price, cp.stock, c.price as client_price
+        $sql = 'SELECT r.*, cp.name, cp.url, cp.price, co.priority, co.logo, co.active, cp.id_product, cph.new_price, cph.old_price, cp.stock, c.price as client_price, cp.date_add
         FROM '._DB_PREFIX_.'products_relation r
         LEFT JOIN '._DB_PREFIX_.'competitor_product cp ON r.id_product_competitor = cp.id_product
         LEFT JOIN '._DB_PREFIX_.'client_product c ON r.id_product_client = c.id_product
