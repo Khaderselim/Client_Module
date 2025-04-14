@@ -1,4 +1,4 @@
----
+
 # Introduction
 
 This project introduces a semi-automated PrestaShop module designed for e-commerce users to monitor and extract data from competitors’ product listings. The module allows users to select products from their catalog and input URLs of similar products offered by competitors. 
@@ -10,6 +10,15 @@ Data extraction is powered by a Python-based API running in a Dockerized server 
 ---
 
 # Getting Started
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Prerequisites](#prerequisites)
+3. [Installation](#installation)
+   - [API Setup with Docker](#1-api-setup-with-docker)
+   - [Module Installation in PrestaShop](#2-module-installation-in-prestashop)
+   - [Insert Your Product Table in the Database](#3-insert-your-product-table-in-the-database)
+4. [Start Tracking Products](#4-start-tracking-products)
 
 ## Overview
 
@@ -30,7 +39,7 @@ Ensure you have the following installed:
 
 # Installation
 
-## 🐳 1. API Setup with Docker
+## 1. API Setup with Docker
 
 For a smooth and quick installation, we recommend running the API using **Docker**.
 
@@ -91,7 +100,7 @@ If you prefer a GUI, you can use **Docker Desktop** to:
 
 ---
 
-## 🧩 2. Module Installation in PrestaShop
+## 2. Module Installation in PrestaShop
 
 ### Step 1: Download the Module
 
@@ -139,15 +148,16 @@ C:/laragon/www/prestashop/modules
 
 ---
 
-## 🗃️ 3. Insert Your Product Table in the Database
+## 3. Insert Your Product Table in the Database
 
 ### Step 1: Connect to the PrestaShop Database
 
-Use one of the following tools to connect:
+Use one of the following tools or any other MySQL-compatible tool to connect :
 
 - **phpMyAdmin** (typically included with Laragon/XAMPP)
 - **MySQL Workbench**
 - **Database tools in your IDE** (e.g., VS Code, PhpStorm, etc.)
+
 
 ---
 
@@ -225,7 +235,7 @@ foreach ($products as $product) {
 
 ---
 
-## 📊 4. Start Tracking Products
+## 4. Start Tracking Products
 
 ### Step 1: Create Categories
 
@@ -262,9 +272,8 @@ foreach ($products as $product) {
 
 4. Click **Save**.
 
---- 
+---
 
 ![ClientModule](https://github.com/user-attachments/assets/e665480e-5479-40d2-90c1-3f57aac1908f)
-
 
 
