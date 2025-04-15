@@ -62,7 +62,7 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'competitor_pattern` (
 $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'client_product` (
     `id_product` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
-    `url` varchar(255) NOT NULL UNIQUE,
+    `img_url` varchar(255) NOT NULL,
     `price` varchar(255) NOT NULL,
     `description` text NOT NULL,
     `id_client_catalog` int(11) NULL,

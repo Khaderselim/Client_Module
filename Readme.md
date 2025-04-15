@@ -17,7 +17,6 @@ Data extraction is powered by a Python-based API running in a Dockerized server 
 3. [Installation](#installation)
    - [API Setup with Docker](#1-api-setup-with-docker)
    - [Module Installation in PrestaShop](#2-module-installation-in-prestashop)
-   - [Insert Your Product Table in the Database](#3-insert-your-product-table-in-the-database)
 4. [Start Tracking Products](#4-start-tracking-products)
 
 ## Overview
@@ -167,73 +166,7 @@ Create and insert your custom product table into the PrestaShop database. Name t
 
 ---
 
-### Step 3: Modify the Module to Use Your Table
 
-Edit the following file:
-
-```
-prestashop/modules/client/controllers/admin/AdminClientproductsController.php
-```
-
-#### A. Update `processAdd()` Method
-
-- **Line 316**: Update the table name:
-
-    ```php
-    $db_product = Db::getInstance()->getRow("SELECT * FROM " . _DB_PREFIX_ . "your_product_table WHERE name = '" . pSQL($main_product->name) . "'");
-    ```
-
-- **Lines 364–367**: Update keys to match your table’s columns:
-
-    ```php
-    $main_product->name = $db_product['name'];
-    $main_product->url = $db_product['url'];
-    $main_product->price = $db_product['price'];
-    $main_product->description = $db_product['description']; // Optional
-    ```
-
----
-
-#### B. Update `processUpdate()` Method
-
-- **Line 525**: Update the table name:
-
-    ```php
-    $db_product = Db::getInstance()->getRow("SELECT * FROM " . _DB_PREFIX_ . "your_product_table WHERE name = '" . pSQL($main_product->name) . "'");
-    ```
-
-- **Lines 526–528**: Update the column keys:
-
-    ```php
-    $main_product->url = $db_product['url'];
-    $main_product->price = $db_product['price'];
-    $main_product->description = $db_product['description']; // Optional
-    ```
-
----
-
-#### C. Update `ajaxProcessSearchTargetProducts()` Method
-
-Replace `"target_product"` with your custom table name and update fields (`url`, `name`, `price`, etc.):
-
-```php
-$products = Db::getInstance()->executeS('
-    SELECT *
-    FROM `' . _DB_PREFIX_ . 'your_product_table`
-    WHERE name LIKE "%' . pSQL($query) . '%"
-    LIMIT 10
-');
-
-foreach ($products as $product) {
-    $html .= '<li class="search-item" data-url="' . htmlspecialchars($product['url']) . '">' .
-        '<span class="product-name">' . htmlspecialchars($product['name']) . '</span>' .
-        '<small class="text-muted"><strong>URL: </strong>' . htmlspecialchars($product['url']) . '</small><br>' .
-        '<small class="text-muted"><strong>Price: </strong>' . htmlspecialchars($product['price']) . '</small>' .
-        '</li>';
-}
-```
-
----
 
 ## 4. Start Tracking Products
 
