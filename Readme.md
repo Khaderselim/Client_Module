@@ -40,12 +40,12 @@ Ensure you have the following installed:
 
 ## 1. API Setup with Docker
 
-For a smooth and quick installation, we recommend running the API using **Docker**.
+For a smooth and quick installation, we recommend running the API using **Docker** ([Linux](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository) / [Windows](https://docs.docker.com/docker-for-windows/install/)).
 
 ### Steps
 
-1. **Download the `server` folder** from the repository:
-    - [here](https://github.com/Khaderselim/Client_Module.git)
+1. **Download the `server` folder** from the repository [Khaderselim/Client_Module](https://github.com/Khaderselim/Client_Module.git)
+   
 
 2. **Open a terminal** in the project folder (where the `docker-compose.yml` file is located), then run:
 
@@ -102,9 +102,7 @@ If you prefer a GUI, you can use **Docker Desktop** to:
 
 ### Step 1: Download the Module
 
-- Download the `client` folder from the repository:
-    - [here](https://github.com/Khaderselim/Client_Module.git)
-
+- Download the `client` folder from the repository [Khaderselim/Client_Module](https://github.com/Khaderselim/Client_Module.git)
 ---
 
 ### Step 2: Move the Module to PrestaShop
