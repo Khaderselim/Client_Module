@@ -175,5 +175,4 @@ def compare():
         return jsonify({'error': str(e)}), 500
 if __name__ == '__main__':
     # Set the port from environment variable or default to 8000
-    port = int(os.environ.get('PORT', 8000))
-    app.run(debug=False, host='0.0.0.0', port=port, threaded=True)
+    app.run(debug=False, host='0.0.0.0', port=8000, threaded=True)
