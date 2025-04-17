@@ -65,8 +65,8 @@ For a smooth and quick installation, we recommend running the API using **Docker
 
 If port `8000` is already in use or you want to change it, open the `api.py` file and update the following line (162):
 
-```yaml
-   app.run(debug=False, host='0.0.0.0', port=8002, threaded=True) // change the value of the port
+```bash
+app.run(debug=False, host='0.0.0.0', port=8000, threaded=True) // change the value of the port
 ```
 
 After making changes, restart the container:
