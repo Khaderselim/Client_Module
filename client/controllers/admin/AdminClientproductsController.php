@@ -7,6 +7,7 @@ require_once _PS_MODULE_DIR_ . 'client/classes/ClientCatalog.php';
 
 class AdminClientproductsController extends ModuleAdminController
 {
+    private $apiConfig;
 
     /**
      * @throws PrestaShopException
@@ -23,7 +24,7 @@ class AdminClientproductsController extends ModuleAdminController
         $this->identifier = 'id_product';
 
         $this->list_no_link = true; // Disable default link to edit product
-
+        $this->apiConfig = require_once _PS_MODULE_DIR_.'client/config/api.php';
         parent::__construct();
 
 
@@ -338,7 +339,7 @@ class AdminClientproductsController extends ModuleAdminController
                     $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$id_competitor);
                     $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$id_competitor);
 
-                    $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($competitor['url']);
+                    $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($competitor['url']);
                     if ($priceAttributes) {
                         $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
                     }
@@ -472,7 +473,7 @@ class AdminClientproductsController extends ModuleAdminController
                     $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$existing_product['id_competitor']);
                     $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$existing_product['id_competitor']);
 
-                    $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($competitor['url']);
+                    $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($competitor['url']);
                     if ($priceAttributes) {
                         $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
                     }
@@ -501,7 +502,7 @@ class AdminClientproductsController extends ModuleAdminController
                     $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$id_competitor);
                     $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$id_competitor);
 
-                    $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($competitor['url']);
+                    $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($competitor['url']);
                     if ($priceAttributes) {
                         $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
                     }
@@ -706,7 +707,7 @@ class AdminClientproductsController extends ModuleAdminController
                 $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
                 $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
 
-                $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($cp['url']);
+                $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($cp['url']);
                 if ($priceAttributes) {
                     $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
                 }
@@ -814,7 +815,7 @@ class AdminClientproductsController extends ModuleAdminController
             $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
             $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
 
-            $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($cp['url']);
+            $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($cp['url']);
             if ($priceAttributes) {
                 $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
             }
@@ -907,7 +908,7 @@ class AdminClientproductsController extends ModuleAdminController
                 $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
                 $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
 
-                $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($cp['url']);
+                $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($cp['url']);
                 if ($priceAttributes) {
                     $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
                 }

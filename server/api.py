@@ -8,6 +8,8 @@ from Pattern_extractor import extract_pattern
 from urllib.parse import urlparse
 import os
 from Values_extractor import DOMExtractor
+from param_test import test_method
+
 
 app = Flask(__name__) # Initialize Flask app
 app.config['SESSION_TYPE'] = 'filesystem' # Configure session type
@@ -85,7 +87,7 @@ def extract_price():
     """
     try:
         url = request.args.get('url') # Get URL from request
-        param = request.args.get('param') # Get price_param from request
+        param = request.args.get('param') # Get param from request
         descr_param = request.args.get('descr_param') # Get descr_param from request
         stock_param = request.args.get('stock_param') or None # Get stock_param from request or None if not provided
         # Validate URL

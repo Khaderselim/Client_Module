@@ -4,6 +4,7 @@ require_once _PS_MODULE_DIR_ . 'client/classes/ClientCatalog.php';
 
 class AdminClientCompetitorsController extends ModuleAdminController
 {
+    private $apiConfig;
     /**
      * @throws PrestaShopException
      * This constructor initializes the AdminClientCompetitorsController class.
@@ -21,6 +22,7 @@ class AdminClientCompetitorsController extends ModuleAdminController
         $this->orderBy = 'id_client_competitor';
         $this->orderWay = 'ASC';
         $this->list_no_link = true;// Disable link to edit form
+        $this->apiConfig= require_once _PS_MODULE_DIR_ . 'client/config/api.php';
         parent::__construct();
 
         $this->bulk_actions = array(
@@ -338,7 +340,7 @@ class AdminClientCompetitorsController extends ModuleAdminController
             $url = Tools::getValue('url');
 
             // Call pattern extraction API
-            $apiUrl = 'http://localhost:8000/api/extract-patterns?url=' . urlencode($url);
+            $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-patterns?url=' . urlencode($url);
             // Get the response from the API
             $response = $this->callApi($apiUrl);
             $data = json_decode($response, true);
