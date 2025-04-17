@@ -8,7 +8,6 @@ from Pattern_extractor import extract_pattern
 from urllib.parse import urlparse
 import os
 from Values_extractor import DOMExtractor
-from param_test import test_method
 
 
 app = Flask(__name__) # Initialize Flask app
