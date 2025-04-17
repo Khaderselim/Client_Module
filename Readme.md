@@ -146,27 +146,6 @@ C:/laragon/www/prestashop/modules
 
 ---
 
-## 3. Insert Your Product Table in the Database
-
-### Step 1: Connect to the PrestaShop Database
-
-Use one of the following tools or any other MySQL-compatible tool to connect :
-
-- **phpMyAdmin** (typically included with Laragon/XAMPP)
-- **MySQL Workbench**
-- **Database tools in your IDE** (e.g., VS Code, PhpStorm, etc.)
-
-
----
-
-### Step 2: Insert Your Product Table
-
-Create and insert your custom product table into the PrestaShop database. Name the table appropriately (e.g., `my_products`) and keep track of the name for future steps.
-
----
-
-
-
 ## 4. Start Tracking Products
 
 ### Step 1: Create Categories
