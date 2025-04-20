@@ -11,7 +11,7 @@ def remove_html_tags(text):
     return text
 def compare_product(host , user , passwd , database , database_prefix):
     db = mysql.connector.connect(
-        host="197.2.23.1",
+        host=host,
         user=user,
         password=passwd,
         database=database)
