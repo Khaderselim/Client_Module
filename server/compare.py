@@ -5,7 +5,11 @@ from sentence_transformers import SentenceTransformer  # Import SentenceTransfor
 from sklearn.metrics.pairwise import cosine_similarity  # Import cosine_similarity
 import numpy as np  # Import numpy
 import os
-def compare_product(host , user , passwd , database , id_target, database_prefix):
+def remove_html_tags(text):
+    if isinstance(text, str):  # Ensure the input is a string
+        return re.sub(r'<[^>]*>', '', text)
+    return text
+def compare_product(host , user , passwd , database , database_prefix):
     db = mysql.connector.connect(
         host=os.environ.get('MYSQL_HOST', host),
         user=os.environ.get(user),
@@ -14,60 +18,45 @@ def compare_product(host , user , passwd , database , id_target, database_prefix
     cursor = db.cursor()
 
     # Retrieve target products
-    cursor.execute("SELECT * FROM "+database_prefix+"target_product WHERE id_target = %s", (id_target,))
+    cursor.execute(
+        "SELECT DISTINCT prl.name, prl.description, pr.price,pr.id_product FROM `"+database_prefix+"product` pr LEFT JOIN `"+database_prefix+"product_lang` prl ON prl.id_product = pr.id_product ")
     products = cursor.fetchall()
 
     # Convert to pandas DataFrame
     df = pd.DataFrame(products, columns=[i[0] for i in cursor.description])
+    # print(df)
 
-    # Check if target products exist
-    if df.empty:
-        print(f"No target products found for id_target: {id_target}")
-        return
-
-    # Retrieve price history
-    cursor.execute("select p.* , c.id_target from "+database_prefix+"price_history p LEFT JOIN "+database_prefix+"competitor_target c on p.id_competitor = c.id_competitor WHERE c.id_target = %s", (id_target,))
-    product = cursor.fetchall()
-    dfs = pd.DataFrame(product, columns=[i[0] for i in cursor.description])
-
-    # Check if price history exists
-    if dfs.empty:
-        print(f"No price history found for id_target: {id_target}")
-        return
-
-    # Initialize the SentenceTransformer model
+    cursor.execute("SELECT * FROM `"+database_prefix+"target_competitor_product`")
+    competitors = cursor.fetchall()
+    # Convert to pandas DataFrame
+    df_competitors = pd.DataFrame(competitors, columns=[i[0] for i in cursor.description])
+    # print(df_competitors)
     model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-
-    # Embed the product names, descriptions, and prices for df
     df['name_description_price'] = (
-    df['name'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
-    df['name'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
-    df['name'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
-    df['description'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
-    df['price'].astype(str)
+            df['name'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
+            df['name'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
+            df['name'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
+            df['description'].apply(remove_html_tags).str.lower().apply(
+                lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
+            df['price'].astype(str)
     )
     df_embeddings = model.encode(df['name_description_price'].tolist())
-
-    # Embed the product names, descriptions, and prices for dfs
-    dfs['name_description_price'] = (
-    dfs['product_title'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
-    dfs['product_title'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
-    dfs['product_title'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
-    dfs['product_description'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
-    dfs['price_raw'].astype(str)
+    # Embed the product names, descriptions, and prices for df_competitors
+    df_competitors['name_description_price'] = (
+            df_competitors['name'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
+            df_competitors['name'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
+            df_competitors['name'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
+            df_competitors['description'].str.lower().apply(lambda x: re.sub(r'[^\w\s]', ' ', str(x))) + ' ' +
+            df_competitors['price'].astype(str)
     )
-    dfs_embeddings = model.encode(dfs['name_description_price'].tolist())
-
-    # Calculate cosine similarity between the embeddings of df and dfs
+    dfs_embeddings = model.encode(df_competitors['name_description_price'].tolist())
     similarities = cosine_similarity(df_embeddings, dfs_embeddings)
 
     # Add the similarity scores to the DataFrame
-    dfs['similarity'] = similarities.max(axis=0)
+    df_competitors['similarity'] = similarities.max(axis=0)
 
     # Find the most similar product for each product in df
     most_similar_indices = similarities.argmax(axis=0)
-
-    # Ensure no two products share the same most similar product
     assigned_indices = set()
     for i in range(len(most_similar_indices)):
         if most_similar_indices[i] in assigned_indices:
@@ -77,28 +66,27 @@ def compare_product(host , user , passwd , database , id_target, database_prefix
                     most_similar_indices[i] = idx
                     assigned_indices.add(idx)
                     break
-        else:
-            assigned_indices.add(most_similar_indices[i])
+                else:
+                    assigned_indices.add(most_similar_indices[i])
 
     x = pd.DataFrame({
         'most_similar_product_id': df['id_product'].iloc[most_similar_indices].values,
-        'most_similar_history_id': dfs['id_history'].values,
+        'most_similar_competitor_product_id': df_competitors['id_product'].values,
         'product_name': df['name'].iloc[most_similar_indices].values,
-        'history_name': dfs['product_title'].values,
+        'competitor_product_name': df_competitors['name'].values,
         'product_price': df['price'].iloc[most_similar_indices].values,
-        'history_price': dfs['price_raw'].values,
-        'product_url': df['url'].iloc[most_similar_indices].values,
-        'history_url': dfs['product_url'].values,
+        'competitor_product_price': df_competitors['price'].values,
+        'competitor_product_url': df_competitors['url'].values,
         'similarity': similarities.max(axis=0)
     })
-    # Save most_similar_product_id and most_similar_history_id in the table "+database_prefix+"product_history_relation
+
     for index, row in x.iterrows():
         cursor.execute("""
-            INSERT INTO """+database_prefix+"""product_history_relation (id_product, id_history)
-            VALUES (%s, %s)
-            ON DUPLICATE KEY UPDATE
-            id_product = VALUES(id_product)
-        """, (int(row['most_similar_product_id']), int(row['most_similar_history_id'])))
+               INSERT INTO """+database_prefix+"""comparing_product (id_product, id_competitor_product,similarity)
+               VALUES (%s, %s, %s)
+               ON DUPLICATE KEY UPDATE
+               id_product = VALUES(id_product)
+           """, (int(row['most_similar_product_id']), int(row['most_similar_competitor_product_id']), float(row['similarity'])))
     db.commit()
 
 
