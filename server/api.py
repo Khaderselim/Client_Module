@@ -165,10 +165,9 @@ def compare():
         user = request.args.get('user')
         password = request.args.get('passwd')
         database = request.args.get('database')
-        id_target = request.args.get('id_target')
         database_prefix = request.args.get('database_prefix')
 
-        result = compare_product(host, user, password, database, id_target, database_prefix)
+        result = compare_product(host, user, password, database, database_prefix)
         return jsonify({'success': True, 'result': result})
 
     except Exception as e:
