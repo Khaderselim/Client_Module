@@ -5,7 +5,7 @@ services:
     build: .
     network_mode: "host" # Use host network mode to access host services directly
     environment:
-      - MYSQL_HOST=host.docker.internal
+      - MYSQL_HOST=host.docker.external
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
