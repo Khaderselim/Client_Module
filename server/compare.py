@@ -11,10 +11,10 @@ def remove_html_tags(text):
     return text
 def compare_product(host , user , passwd , database , database_prefix):
     db = mysql.connector.connect(
-        host=os.environ.get('MYSQL_HOST', host),
-        user=os.environ.get(user),
-        password=os.environ.get(passwd),
-        database=os.environ.get('MYSQL_DATABASE', database))
+        host=host,
+        user=user,
+        password=passwd,
+        database=database)
     cursor = db.cursor()
 
     # Retrieve target products
