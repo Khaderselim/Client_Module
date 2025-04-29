@@ -1,0 +1,6 @@
+/.venv
+/server/flask_session
+/server/custom_ner_model_best_2
+/server/custom_ner_model_best_3
+/server/custom_ner_model_best_specs_3
+/server/specs-ner-model
