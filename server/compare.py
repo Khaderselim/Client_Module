@@ -4,12 +4,15 @@ import pandas as pd  # Import pandas
 from sentence_transformers import SentenceTransformer  # Import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity  # Import cosine_similarity
 import numpy as np  # Import numpy
-import os
 from transformers import  AutoTokenizer, AutoModelForTokenClassification
 import torch
 
 model = AutoModelForTokenClassification.from_pretrained("./specs-ner-model")
 tokenizer = AutoTokenizer.from_pretrained("./specs-ner-model")
+model_brand = AutoModelForTokenClassification.from_pretrained("./brand-ner-model")
+tokenizer_brand = AutoTokenizer.from_pretrained("./brand-ner-model")
+id2label_brand = model_brand.config.id2label
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model.eval()
 model.to(device)
@@ -118,15 +121,43 @@ def remove_html_tags(text):
     if isinstance(text, str):  # Ensure the input is a string
         return re.sub(r'<[^>]*>', '', text)
     return text
-def extract_brands(text):
-    list_ = []
+def extract_brands(examples):
+    """
+    Test the trained model_brand on a few examples
+    """
+    model_brand.eval()
+    model_brand.to("cuda" if torch.cuda.is_available() else "cpu")
 
-    doc = nlp(text)
-    for ent in doc.ents:
-        # Skip empty strings and numeric values
-        if ent.text.strip() and not ent.text.isdigit():
-            list_.append(ent.text)
-    return list_
+
+
+    tokens = examples.split()
+    # Get both the inputs and encoding object
+    encoding = tokenizer_brand(tokens, is_split_into_words=True, return_tensors="pt", padding=True, truncation=True)
+    inputs = {k: v.to(model_brand.device) for k, v in encoding.items()}
+    with torch.no_grad():
+        outputs = model_brand(**inputs)
+    predictions = torch.argmax(outputs.logits, dim=2)
+    predicted_labels = [id2label_brand[p.item()] for p in predictions[0]]
+    # Use the tokenizer_brand object to get word_ids
+    word_ids = tokenizer_brand(tokens, is_split_into_words=True).word_ids()
+    aligned_preds = []
+    current_word = None
+    for word_idx, pred_label in zip(word_ids, predicted_labels):
+        if word_idx is None:
+            continue
+        if word_idx != current_word:
+            aligned_preds.append(pred_label)
+            current_word = word_idx
+    # Truncate predictions to match input length
+    aligned_preds = aligned_preds[:len(tokens)]
+    # Format the results
+    result = []
+    for token, label in zip(tokens, aligned_preds):
+        if label != 'O':
+            result.append(token)
+
+
+    return result
 def compare_product(host , user , passwd , database , database_prefix):
     db = mysql.connector.connect(
         host=os.environ.get('MYSQL_HOST', host),
@@ -182,7 +213,9 @@ def compare_product(host , user , passwd , database , database_prefix):
     for entity_type, values in entity_columns.items():
         df_competitors[entity_type] = values
     # print(df_competitors)
-    model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+    model = SentenceTransformer('./compare_model')
+
+
 
     df_embeddings = create_weighted_embeddings(df, model, name_weight=3.0, brand_weight=3.0, component_weight=4.0,description_weight=2.0,
                                                price_weight=1.0)
@@ -221,7 +254,6 @@ def compare_product(host , user , passwd , database , database_prefix):
         'history_brands': df_competitors['brands'].values,
         'similarity': similarities.max(axis=0)
     })
-
     for index, row in x.iterrows():
         cursor.execute("""
                INSERT INTO """+database_prefix+"""comparing_product
