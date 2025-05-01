@@ -5,11 +5,9 @@ from sentence_transformers import SentenceTransformer  # Import SentenceTransfor
 from sklearn.metrics.pairwise import cosine_similarity  # Import cosine_similarity
 import numpy as np  # Import numpy
 import os
-import spacy
 from transformers import  AutoTokenizer, AutoModelForTokenClassification
 import torch
 
-nlp = spacy.load("./custom_ner_model_best_3")
 model = AutoModelForTokenClassification.from_pretrained("./specs-ner-model")
 tokenizer = AutoTokenizer.from_pretrained("./specs-ner-model")
 device = "cuda" if torch.cuda.is_available() else "cpu"
