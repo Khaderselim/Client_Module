@@ -5,6 +5,7 @@ from sentence_transformers import SentenceTransformer  # Import SentenceTransfor
 from sklearn.metrics.pairwise import cosine_similarity  # Import cosine_similarity
 import numpy as np  # Import numpy
 from transformers import  AutoTokenizer, AutoModelForTokenClassification
+import os
 import torch
 
 model = AutoModelForTokenClassification.from_pretrained("./specs-ner-model")
