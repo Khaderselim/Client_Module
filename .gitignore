@@ -1,5 +1,3 @@
 /.venv
 /server/flask_session
-/server/brand-ner-model
-/server/compare_model
-/server/specs-ner-model
+
