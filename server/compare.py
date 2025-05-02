@@ -267,4 +267,3 @@ def compare_product(host , user , passwd , database , database_prefix):
                  row['product_brands'], row['history_brands'], float(row['similarity'])))
     db.commit()
 
-
