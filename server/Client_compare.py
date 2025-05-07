@@ -160,7 +160,7 @@ def extract_brands(examples):
 
 
     return result
-def compare_product(host , user , passwd , database , database_prefix):
+def compare_client_product(host , user , passwd , database , database_prefix):
     db = mysql.connector.connect(
         host=host,
         user=user,
@@ -194,7 +194,7 @@ def compare_product(host , user , passwd , database , database_prefix):
         df[entity_type] = values
     # print(df)
 
-    cursor.execute("SELECT * FROM `"+database_prefix+"target_competitor_product`")
+    cursor.execute("SELECT * FROM `"+database_prefix+"competitor_product`")
     competitors = cursor.fetchall()
     # Convert to pandas DataFrame
     df_competitors = pd.DataFrame(competitors, columns=[i[0] for i in cursor.description])
@@ -258,7 +258,7 @@ def compare_product(host , user , passwd , database , database_prefix):
     })
     for index, row in x.iterrows():
         cursor.execute("""
-               INSERT INTO """+database_prefix+"""suggestion_product
+               INSERT INTO """+database_prefix+"""client_suggestion_product
                (id_product, id_competitor_product, product_brands, competitor_product_brands, similarity)
                VALUES (%s, %s, %s, %s, %s)
                ON DUPLICATE KEY UPDATE

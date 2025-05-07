@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>client_comparing</name>
+	<displayName><![CDATA[Client Compare]]></displayName>
+	<version><![CDATA[1.0.0]]></version>
+	<description><![CDATA[This module check the similarity between client\'s product and the competitor\'s and gives suggestions]]></description>
+	<author><![CDATA[Mohamed Selim Khader]]></author>
+	<tab><![CDATA[seo]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+</module>
