@@ -1,6 +1,8 @@
 """
 This script is a Flask web application that provides several endpoints for extracting price patterns and values from web pages.
 """
+import json
+
 from flask import Flask, jsonify, request, session
 from compare import compare_product
 from target_compare import compare_tracking_product
@@ -11,6 +13,7 @@ from Pattern_extractor import extract_pattern
 from urllib.parse import urlparse
 import os
 from Values_extractor import DOMExtractor
+from test_compare import test_comparing
 
 
 app = Flask(__name__) # Initialize Flask app
@@ -296,9 +299,17 @@ def client_suggestion_compare():
             'success': True,
             'message': 'Comparison completed successfully'
         })
-
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/calculate_similarity', methods=['GET'])
+def calculate_similarity():
+    original_product = json.loads(request.args.get('original_product'))
+    competitor_product = json.loads(request.args.get('competitor_product'))
+    similarity = test_comparing(original_product, competitor_product)
+    return jsonify({
+        'similarity': similarity
+    })
 if __name__ == '__main__':
     # change the port value (default to 8000)
     app.run(debug=False, host='0.0.0.0', port=8000, threaded=True)
