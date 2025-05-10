@@ -1,13 +1,19 @@
 """
 This script is a Flask web application that provides several endpoints for extracting price patterns and values from web pages.
 """
+import json
+
 from flask import Flask, jsonify, request, session
 from compare import compare_product
+from target_compare import compare_tracking_product
+from Client_compare import compare_client_product
+from Client_tracking_compare import compare_client_tracking_product
 from flask_session import Session
 from Pattern_extractor import extract_pattern
 from urllib.parse import urlparse
 import os
 from Values_extractor import DOMExtractor
+
 
 app = Flask(__name__) # Initialize Flask app
 app.config['SESSION_TYPE'] = 'filesystem' # Configure session type
@@ -85,7 +91,7 @@ def extract_price():
     """
     try:
         url = request.args.get('url') # Get URL from request
-        param = request.args.get('param') # Get price_param from request
+        param = request.args.get('param') # Get param from request
         descr_param = request.args.get('descr_param') # Get descr_param from request
         stock_param = request.args.get('stock_param') or None # Get stock_param from request or None if not provided
         # Validate URL
@@ -166,11 +172,143 @@ def compare():
         database = request.args.get('database')
         database_prefix = request.args.get('database_prefix')
 
-        result = compare_product(host, user, password, database, database_prefix)
-        return jsonify({'success': True, 'result': result})
+        compare_product(host, user, password, database, database_prefix)
+        compare_tracking_product(host, user, password, database, database_prefix)
+
+        return jsonify({
+            'success': True,
+            'message': 'Comparison completed successfully'
+        })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/tracking_compare', methods=['GET'])
+def tracking_compare():
+    """
+    Compare products using the compare_product function (from compare.py).
+    Returns: jsonify: JSON response containing the comparison result
+
+    """
+    try:
+        host = request.args.get('host')
+        user = request.args.get('user')
+        password = request.args.get('passwd')
+        database = request.args.get('database')
+        database_prefix = request.args.get('database_prefix')
+
+        compare_tracking_product(host, user, password, database, database_prefix)
+        return jsonify({
+            'success': True,
+            'message': 'Comparison completed successfully'
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/suggestion_compare', methods=['GET'])
+def suggestion_compare():
+    """
+    Compare products using the compare_product function (from compare.py).
+    Returns: jsonify: JSON response containing the comparison result
+
+    """
+    try:
+        host = request.args.get('host')
+        user = request.args.get('user')
+        password = request.args.get('passwd')
+        database = request.args.get('database')
+        database_prefix = request.args.get('database_prefix')
+
+        compare_product(host, user, password, database, database_prefix)
+        return jsonify({
+            'success': True,
+            'message': 'Comparison completed successfully'
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+@app.route('/api/client_compare', methods=['GET'])
+def client_compare():
+    """
+    Compare products using the compare_product function (from compare.py).
+    Returns: jsonify: JSON response containing the comparison result
+
+    """
+    try:
+        host = request.args.get('host')
+        user = request.args.get('user')
+        password = request.args.get('passwd')
+        database = request.args.get('database')
+        database_prefix = request.args.get('database_prefix')
+
+        compare_client_product(host, user, password, database, database_prefix)
+        compare_client_tracking_product(host, user, password, database, database_prefix)
+
+        return jsonify({
+            'success': True,
+            'message': 'Comparison completed successfully'
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/client_tracking_compare', methods=['GET'])
+def client_tracking_compare():
+    """
+    Compare products using the compare_product function (from compare.py).
+    Returns: jsonify: JSON response containing the comparison result
+
+    """
+    try:
+        host = request.args.get('host')
+        user = request.args.get('user')
+        password = request.args.get('passwd')
+        database = request.args.get('database')
+        database_prefix = request.args.get('database_prefix')
+
+        compare_client_tracking_product(host, user, password, database, database_prefix)
+        return jsonify({
+            'success': True,
+            'message': 'Comparison completed successfully'
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/client_suggestion_compare', methods=['GET'])
+def client_suggestion_compare():
+    """
+    Compare products using the compare_product function (from compare.py).
+    Returns: jsonify: JSON response containing the comparison result
+
+    """
+    try:
+        host = request.args.get('host')
+        user = request.args.get('user')
+        password = request.args.get('passwd')
+        database = request.args.get('database')
+        database_prefix = request.args.get('database_prefix')
+
+        compare_client_product(host, user, password, database, database_prefix)
+        return jsonify({
+            'success': True,
+            'message': 'Comparison completed successfully'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/calculate_similarity', methods=['GET'])
+def calculate_similarity():
+    original_product = json.loads(request.args.get('original_product'))
+    competitor_product = json.loads(request.args.get('competitor_product'))
+    similarity = test_comparing(original_product, competitor_product)
+    return jsonify({
+        'similarity': similarity
+    })
 if __name__ == '__main__':
     # Set the port from environment variable or default to 8000
     port = int(os.environ.get('PORT', 8000))

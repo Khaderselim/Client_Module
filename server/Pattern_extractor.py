@@ -174,4 +174,3 @@ if __name__ == "__main__":
     print(description)
     print(stock)
 
-
