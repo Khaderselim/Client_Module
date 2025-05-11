@@ -12,6 +12,7 @@ class ClientProduct extends ObjectModel {
      * @var string $id_client_catalog The ID of the client category associated with this product
      * @var string $date_add The date the product was added
      * */
+    public $id_client_product;
     public $id_product;
     public $name;
     public $img_url;
@@ -24,9 +25,10 @@ class ClientProduct extends ObjectModel {
      */
     public static $definition = array(
         'table' => 'client_product',
-        'primary' => 'id_product',
+        'primary' => 'id_client_product',
         'fields' => array(
             'name' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true),
+            'id_product' => array('type' => self::TYPE_INT, 'validate' => 'isInt', 'required' => true),
             'img_url' => array('type' => self::TYPE_STRING, 'validate' => 'isUrl'),
             'price' => array('type' => self::TYPE_STRING,  'required' => true),
             'description' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'),

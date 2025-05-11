@@ -1,6 +1,6 @@
 {extends file="helpers/form/form.tpl"}
 <!--
-    This template is used to render the form for the Clientproducts module in the admin panel.
+    This template is used to render the form for the clientproducts module in the admin panel.
     It includes a section for adding competitors and a search input for target products.
     The competitors section allows the user to add, edit, and delete competitor URLs.
     The search input provides an AJAX-based search functionality to find target products.

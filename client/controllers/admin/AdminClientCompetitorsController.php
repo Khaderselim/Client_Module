@@ -111,6 +111,31 @@ class AdminClientCompetitorsController extends ModuleAdminController
     }
 
     /**
+     * @return void
+     * This method is used to remove the default toolbar buttons.
+     */
+    public function initToolbar()
+    {
+    }
+
+    /**
+     * @return void
+     * This method is used to initialize the page header toolbar.
+     * It adds a button to create a new competitor.
+     */
+    public function initPageHeaderToolbar()
+    {
+        parent::initPageHeaderToolbar();
+        if (Tools::getValue('addclient_competitor') === false && Tools::getValue('updateclient_competitor') === false) {
+            $this->page_header_toolbar_btn['new'] = [
+                'href' => self::$currentIndex . '&add' . $this->table . '&token=' . $this->token,
+                'desc' => $this->trans('Add new', [], 'Admin.Actions'),
+                'icon' => 'process-icon-new'
+            ];
+        }
+        $this->page_header_toolbar_title = $this->l('List of Competitors');
+    }
+    /**
      * @return string
      * @throws SmartyException
      * This method is used to render the form for creating or editing a competitor.

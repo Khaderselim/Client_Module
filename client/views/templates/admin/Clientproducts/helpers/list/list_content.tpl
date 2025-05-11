@@ -11,7 +11,7 @@ By default, only the first competitor is shown, but the section can be expanded 
 
     {if $key == 'competitors'}
         <div class="competitors-inline-list">
-            <table class="table competitors-table-{$tr.id_product}">
+            <table class="table competitors-table-{$tr.id_client_product}">
                 <thead>
                 <tr>
                     <th>Priority</th>
@@ -26,7 +26,7 @@ By default, only the first competitor is shown, but the section can be expanded 
                 </tr>
                 </thead>
                 <tbody>
-                {assign var=competitors value=Products_relation::getProductRelations($tr.id_product)} {* Get competitors for the product *}
+                {assign var=competitors value=Products_relation::getProductRelations($tr.id_client_product)} {* Get competitors for the product *}
                 {assign var=activeCount value=0}
                 {if $competitors}
                     {foreach from=$competitors item=competitor name=compLoop}

@@ -60,14 +60,15 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'competitor_pattern` (
 
 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'client_product` (
-    `id_product` int(11) NOT NULL AUTO_INCREMENT,
+    `id_client_product` int(11) NOT NULL AUTO_INCREMENT,
+    `id_product` int(11) NOT NULL,
     `name` varchar(255) NOT NULL,
     `img_url` varchar(255) NOT NULL,
     `price` varchar(255) NOT NULL,
     `description` text NOT NULL,
     `id_client_catalog` int(11) NULL,
     `date_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id_product`),
+    PRIMARY KEY (`id_client_product`),
     FOREIGN KEY (`id_client_catalog`) 
         REFERENCES `'._DB_PREFIX_.'client_catalog` (`id_client_catalog`) 
         ON DELETE SET NULL
@@ -95,7 +96,7 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'products_relation` (
     CONSTRAINT `fk_competitor_relation` FOREIGN KEY (`id_product_competitor`) 
     REFERENCES `'._DB_PREFIX_.'competitor_product` (`id_product`) ON DELETE CASCADE,
     CONSTRAINT `fk_client_relation` FOREIGN KEY (`id_product_client`) 
-    REFERENCES `'._DB_PREFIX_.'client_product` (`id_product`) ON DELETE CASCADE
+    REFERENCES `'._DB_PREFIX_.'client_product` (`id_client_product`) ON DELETE CASCADE
 ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
 
 $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'competitor_products_history` (
@@ -130,6 +131,7 @@ BEGIN
         );
     END IF; 
 END;';
+
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {
         return false;

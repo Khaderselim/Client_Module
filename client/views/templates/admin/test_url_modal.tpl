@@ -14,9 +14,67 @@ It includes a form with fields for the URL, price, description, and stock option
                 <form id="testUrlForm">
                     <div class="form-group">
                         <label for="test_url">URL:</label>
-                        <input type="url" class="form-control" id="test_url" required>
+                        <input type="url" class="form-control" id="test_url" >
                     </div>
 
+                    <div class="form-group">
+                        <button type="button" class="btn btn-link" onclick="toggleAdvancedOptions()">
+                            <i class="icon-cog"></i> Advanced Options
+                        </button>
+                    </div>
+
+                    <!-- Advanced Options Section -->
+                    <div id="advancedOptions" style="display:none;">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#manual-price">Price</a></li>
+                            <li><a data-toggle="tab" href="#manual-description">Description</a></li>
+                            <li><a data-toggle="tab" href="#manual-stock">Stock</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="manual-price">
+                                <div class="form-group">
+                                    <label for="price_tag">Price Tag:</label>
+                                    <input type="text" class="form-control" id="price_tag" placeholder="e.g., span">
+                                </div>
+                                <div class="form-group">
+                                    <label>Price Attributes:</label>
+                                    <div id="priceAttributesList" class="attributes-list"></div>
+                                    <button type="button" class="btn btn-info btn-sm mt-2" onclick="addAttribute('price')">
+                                        <i class="icon-plus"></i> Add Attribute
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="manual-description">
+                                <div class="form-group">
+                                    <label for="description_tag">Description Tag:</label>
+                                    <input type="text" class="form-control" id="description_tag" placeholder="e.g., div">
+                                </div>
+                                <div class="form-group">
+                                    <label>Description Attributes:</label>
+                                    <div id="descriptionAttributesList" class="attributes-list"></div>
+                                    <button type="button" class="btn btn-info btn-sm mt-2" onclick="addAttribute('description')">
+                                        <i class="icon-plus"></i> Add Attribute
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="manual-stock">
+                                <div class="form-group">
+                                    <label for="stock_tag">Stock Tag:</label>
+                                    <input type="text" class="form-control" id="stock_tag" placeholder="e.g., span">
+                                </div>
+                                <div class="form-group">
+                                    <label>Stock Attributes:</label>
+                                    <div id="stockAttributesList" class="attributes-list"></div>
+                                    <button type="button" class="btn btn-info btn-sm mt-2" onclick="addAttribute('stock')">
+                                        <i class="icon-plus"></i> Add Attribute
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div id="priceResults" class="form-group">
                         <ul class="nav nav-tabs">
@@ -24,38 +82,28 @@ It includes a form with fields for the URL, price, description, and stock option
                             <li><a href="#description-tab" data-toggle="tab">Description</a></li>
                             <li><a href="#stock-tab" data-toggle="tab">Stock</a></li>
                         </ul>
-                        {*The price section*}
+
                         <div class="tab-content">
                             <div class="tab-pane active" id="prices-tab">
                                 <label>Select Price:</label>
                                 <div id="radioList"></div>
                             </div>
-                            {*The description section*}
                             <div class="tab-pane" id="description-tab">
                                 <label>Select Description:</label>
                                 <div id="descriptionList"></div>
                             </div>
-                            {*The stock status section*}
                             <div class="tab-pane" id="stock-tab">
                                 <label>Select Stock:</label>
                                 <div id="stockList"></div>
                             </div>
                         </div>
-
-                        <div id="priceResults" class="form-group" style="display:none;">
-                            <label>Select Price:</label>
-                            <div id="radioList"></div>
-                        </div>
+                    </div>
                 </form>
-
             </div>
-
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" onclick="testUrl()">Test</button>
-                <button type="button" class="btn btn-success" id="savePrice" style="display:none;"
-                        onclick="saveSelectedAttributes()">Save
-                </button>
+                <button type="button" class="btn btn-success" id="savePrice" style="display:none;" onclick="saveSelectedAttributes()">Save</button>
             </div>
         </div>
     </div>
@@ -63,8 +111,15 @@ It includes a form with fields for the URL, price, description, and stock option
 <script>
     $(document).ready(function () {
         $('#client_competitor_form').on('submit', function (e) {
-            // Display the modal if it's a new competitor ( When the form is submitted )
-            if (!{$count} && !$('#test_url').val()) {
+            // Check for advanced options
+            const hasAdvancedInput = Boolean(
+                $('#price_tag').val() ||
+                $('#description_tag').val() ||
+                $('#stock_tag').val()
+            );
+
+            // Display the modal if it's a new competitor and no URL or advanced input
+            if (!{$count} && (!hasAdvancedInput && !$('#test_url').val())) {
                 e.preventDefault();
                 showTestUrlPopup();
                 return false;
@@ -85,7 +140,6 @@ It includes a form with fields for the URL, price, description, and stock option
         $('#testUrlForm')[0].reset();
         $('#priceResults').hide();
         $('#savePrice').hide();
-        $('#saveManual').hide();
         $('#radioList').empty();
         $('#testUrlModal').modal('show');
     }
@@ -99,6 +153,12 @@ It includes a form with fields for the URL, price, description, and stock option
         if (!url) {
             alert('Please enter a URL');
             return;
+        }
+
+        const hasAdvancedInput = Boolean($('#price_tag').val() || $('#description_tag').val() || $('#stock_tag').val());
+
+        if (hasAdvancedInput) {
+            $('#advancedOptions').show();
         }
 
         $('#testUrlModal .modal-footer button').prop('disabled', true);
@@ -266,25 +326,54 @@ It includes a form with fields for the URL, price, description, and stock option
         const selectedStock = $('input[name="stock_option"]:checked');
         const testUrl = $('#test_url').val();
 
-        if (!selectedPrice.length) {
-            alert('Please select at least one pattern');
+        // Check if we have advanced options filled
+        const hasAdvancedPrice = $('#price_tag').val().length > 0;
+        const hasAdvancedDesc = $('#description_tag').val().length > 0;
+        const hasAdvancedStock = $('#stock_tag').val().length > 0;
+        const hasAdvancedInput = hasAdvancedPrice || hasAdvancedDesc || hasAdvancedStock;
+
+        // If no URL is provided but we have advanced options, proceed anyway
+        if (!testUrl && !hasAdvancedInput && !selectedPrice.length && !selectedDesc.length && !selectedStock.length) {
+            alert('Please enter a URL or fill in advanced options');
             return;
         }
+
+        const getAttributes = function(type) {
+            const attributes = {};
+            $('input[name="' + type + '_attr_name[]"]').each(function(index) {
+                const name = $(this).val();
+                const value = $('input[name="' + type + '_attr_value[]"]').eq(index).val();
+                if (name && value) {
+                    attributes[name] = value;
+                }
+            });
+            return attributes;
+        };
 
         const priceData = selectedPrice.length ? {
             tag: selectedPrice.data('tag'),
             attributes: selectedPrice.data('attributes')
+        } : $('#price_tag').val().length ? {
+            tag: $('#price_tag').val(),
+            attributes: getAttributes('price')
         } : null;
 
         const descriptionData = selectedDesc.length ? {
             tag: selectedDesc.data('tag'),
             attributes: selectedDesc.data('attributes')
+        } : $('#description_tag').val().length ? {
+            tag: $('#description_tag').val(),
+            attributes: getAttributes('description')
         } : null;
 
         const stockData = selectedStock.length ? {
             tag: selectedStock.data('tag'),
             attributes: selectedStock.data('attributes')
+        } : $('#stock_tag').val().length ? {
+            tag: $('#stock_tag').val(),
+            attributes: getAttributes('stock')
         } : null;
+
         // Ajax request to save the selected attributes (saveTest() function in the controller)
         $.ajax({
             url: '{$current_url|escape:'javascript':'UTF-8'}&action=save_test',
@@ -301,9 +390,10 @@ It includes a form with fields for the URL, price, description, and stock option
                     if (data.success) {
                         $('#testUrlModal').modal('hide');
                         showSuccessMessage(data.message);
-                        // Set both URL fields
-
-                        $('input[name="test_url"]').val(testUrl);
+                        // Set URL field only if we have a URL
+                        if (testUrl) {
+                            $('input[name="test_url"]').val(testUrl);
+                        }
                         // Submit the form
                         $('#client_competitor_form').submit();
                     } else {
@@ -318,6 +408,73 @@ It includes a form with fields for the URL, price, description, and stock option
             }
         });
     }
+    function toggleAdvancedOptions() {
+        const advancedOptions = $('#advancedOptions');
+        const priceResults = $('#priceResults');
+        const savePrice = $('#savePrice');
+        const testUrl = $('#test_url').val();
+        const hasAdvancedInput = Boolean($('#price_tag').val() || $('#description_tag').val() || $('#stock_tag').val());
+
+        if (advancedOptions.is(':visible')) {
+            advancedOptions.hide();
+            if (testUrl && !hasAdvancedInput) {
+                priceResults.show();
+                savePrice.show();
+            }
+        } else {
+            advancedOptions.show();
+            savePrice.show();
+
+        }
+    }
+
+    function addAttribute(type) {
+        const listId = type + 'AttributesList';
+        const html =
+            '<div class="attribute-row">' +
+            '<div class="row">' +
+            '<div class="col-xs-5">' +
+            '<input type="text" class="form-control" placeholder="Name" name="' + type + '_attr_name[]">' +
+            '</div>' +
+            '<div class="col-xs-5">' +
+            '<input type="text" class="form-control" placeholder="Value" name="' + type + '_attr_value[]">' +
+            '</div>' +
+            '<div class="col-xs-2">' +
+            '<button type="button" class="btn btn-danger" onclick="removeAttribute(this)">' +
+            '<i class="icon-trash"></i>' +
+            '</button>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+        $('#' + listId).append(html);
+    }
+    function removeAttribute(button) {
+        $(button).closest('.attribute-row').remove();
+    }
+
+
+    $('#advancedOptions .nav-tabs a').on('click', function(e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+
+    // Initialize results tabs
+    $('#priceResults .nav-tabs a').on('click', function(e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+
+    // Reset modal state when opening
+    $('#testUrlModal').on('show.bs.modal', function() {
+        $('#advancedOptions').hide();
+        $('#priceResults').hide();
+        $('#savePrice').hide();
+        $('#radioList, #descriptionList, #stockList').empty();
+
+        // Reset active tabs
+        $('#advancedOptions .nav-tabs a:first').tab('show');
+        $('#priceResults .nav-tabs a:first').tab('show');
+    });
 </script>
 
 <style>
@@ -399,5 +556,35 @@ It includes a form with fields for the URL, price, description, and stock option
         font-size: 14px;
         margin-bottom: 3px;
         word-break: break-word;
+    }
+
+    .attributes-list {
+        margin-bottom: 10px;
+    }
+
+    .attribute-row {
+        margin-bottom: 10px;
+    }
+
+    .mt-2 {
+        margin-top: 10px;
+    }
+    .nav-tabs > li > a {
+        cursor: pointer;
+    }
+
+    .tab-content {
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-top: none;
+        margin-bottom: 20px;
+    }
+
+    .tab-pane {
+        display: none;
+    }
+
+    .tab-pane.active {
+        display: block;
     }
 </style>
