@@ -6,7 +6,6 @@
 class Competitor extends ObjectModel
 {
     /** @var int $id_client_competitor The unique identifier for the competitor
-
      * @var string $name The name of the competitor
      * @var string $logo The logo of the competitor
      * @var string $url The URL of the competitor

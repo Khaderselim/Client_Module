@@ -72,8 +72,12 @@ def extract_pattern(url: str):
         browser = playwright.chromium.launch(headless=False) # Set headless to True for faster execution, but it's easily blocked by some sites
         page = browser.new_page() # Open a new browser page
         try:
-            page.goto(url, timeout=30000) # Navigate to the URL with a timeout of 30 seconds (adjust as needed)
-            page.wait_for_timeout(2000) # Wait for 2 seconds to allow the page to load
+            page.goto(url, timeout=30000, wait_until='domcontentloaded')
+            page.wait_for_timeout(2000)
+            try:
+                page.wait_for_selector('body', timeout=5000)
+            except:
+                pass
             html_content = page.content() # Get the HTML content of the page
         except Exception as e:
             print(f"Error loading page: {e}")

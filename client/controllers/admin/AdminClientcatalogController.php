@@ -45,6 +45,30 @@ class AdminClientcatalogController extends ModuleAdminController
         $this->addRowAction('delete');
 
     }
+    /**
+     * @return void
+     * This method is used to remove the default toolbar buttons.
+     */
+    public function initToolbar()
+    {
+    }
+
+    /**
+     * @return void
+     * This method is used to initialize the page header toolbar.
+     * It adds a button to create a new competitor.
+     */
+    public function initPageHeaderToolbar()
+    {
+        parent::initPageHeaderToolbar();
+        if (Tools::getValue('addclient_catalog') === false && Tools::getValue('updateclient_catalog') === false) {
+            $this->page_header_toolbar_btn['new'] = [
+                'href' => self::$currentIndex . '&add' . $this->table . '&token=' . $this->token,
+                'desc' => $this->trans('Add new', [], 'Admin.Actions'),
+                'icon' => 'process-icon-new'
+            ];
+        }
+    }
 
     /**
      * @return string

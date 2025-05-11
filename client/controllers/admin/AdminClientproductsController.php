@@ -7,6 +7,7 @@ require_once _PS_MODULE_DIR_ . 'client/classes/ClientCatalog.php';
 
 class AdminClientproductsController extends ModuleAdminController
 {
+    private $apiConfig;
 
     /**
      * @throws PrestaShopException
@@ -20,10 +21,10 @@ class AdminClientproductsController extends ModuleAdminController
         $this->table = 'client_product';
         $this->className = 'ClientProduct';
         $this->lang = false;
-        $this->identifier = 'id_product';
+        $this->identifier = 'id_client_product';
 
         $this->list_no_link = true; // Disable default link to edit product
-
+        $this->apiConfig = require_once _PS_MODULE_DIR_.'client/config/api.php';
         parent::__construct();
 
 
@@ -42,18 +43,25 @@ class AdminClientproductsController extends ModuleAdminController
         );
         // Declaration of the fields for the list
         $this->fields_list = array(
-            'id_product' => array(
+            'id_client_product' => array(
                 'title' => $this->l('ID'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
-                'filter_key' => 'a!id_product'
+                'filter_key' => 'a!id_client_product'
             ),
+            'image' => array(
+                'title' => $this->l('Image'),
+                'align' => 'center',
+                'class' => 'fixed-width-xs',
+                'orderby' => false,
+                'search' => false
+            ), // It will be used to display the image of the product
             'name' => array(
                 'title' => $this->l('Product'),
                 'align' => 'left',
+                'callback' => 'displayName',
                 'filter_key' => 'a!name',
                 'class' => 'fixed-width-xxl',
-                'callback' => 'displayNameLink' // Display the name of the product with a link to the product's page
             ),
 
             'price' => array(
@@ -224,17 +232,12 @@ class AdminClientproductsController extends ModuleAdminController
         return parent::renderForm();
     }
 
-    /**
-     * @param $name
-     * @param $row
-     * @return string
-     * This method is used in the list to display the name of the product with a link to the product's page.
-     */
-    public function displayNameLink($name, $row)
+    public function DisplayName($value, $row)
     {
-        return '<a href="' . $row['url'] . '" target="_blank">' . Tools::safeOutput($name) . '</a>';
-    }
+        $product_link = Context::getContext()->link->getProductLink($row['id_product']);
+        return '<a href="' . $product_link . '" target="_blank">' . $value . '</a>';
 
+    }
 
     /**
      * @param $token
@@ -247,7 +250,7 @@ class AdminClientproductsController extends ModuleAdminController
     public function displayUpdateLink($token, $id, $name)
     {
         // Create a template for the update link
-        $tpl = $this->createTemplate('Clientproducts/helpers/list/list_action_update.tpl');
+        $tpl = $this->createTemplate('clientproducts/helpers/list/list_action_update.tpl');
         // Assign the variables to the template
         $tpl->assign([
             'href' => $this->context->link->getAdminLink('AdminClientproducts'),
@@ -313,8 +316,13 @@ class AdminClientproductsController extends ModuleAdminController
         //Get the product name from the form
         $product_name = Tools::getValue('search');
         //Get the product data from the database
-        $db_product = Db::getInstance()->getRow("SELECT * FROM " . _DB_PREFIX_ . "target_product WHERE name = '" . pSQL($product_name) . "'"); // Change the table name to your target product table
-
+        $currency = Currency::getDefaultCurrency();
+        $iso_code = $currency->iso_code; // Get the currency code
+        $db_product = Db::getInstance()->getRow("SELECT prl.name, prl.description, pr.id_product, pr.price, i.id_image
+            FROM " . _DB_PREFIX_ . "product pr
+            LEFT JOIN " . _DB_PREFIX_ . "product_lang prl ON prl.id_product = pr.id_product
+            LEFT JOIN " . _DB_PREFIX_ . "image i ON i.id_product = pr.id_product AND i.cover = 1
+            WHERE prl.name = '" . pSQL($product_name) . "'");
         // Create API requests array
         $apiRequests = [];
         // Get the id of the product category
@@ -339,7 +347,7 @@ class AdminClientproductsController extends ModuleAdminController
                     $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$id_competitor);
                     $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$id_competitor);
 
-                    $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($competitor['url']);
+                    $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($competitor['url']);
                     if ($priceAttributes) {
                         $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
                     }
@@ -362,9 +370,10 @@ class AdminClientproductsController extends ModuleAdminController
 
         $main_product = new ClientProduct();
         $main_product->name = $db_product['name']; // Get the name from the database
-        $main_product->url = $db_product['url']; // Get the URL from the database
-        $main_product->price = $db_product['price']; // Get the price from the database
-        $main_product->description = ''; // Get the description from the database
+        $main_product->img_url = Context::getContext()->link->getImageLink($db_product['name'],$db_product['id_image']); // Get the image URL from the database
+        $main_product->price = number_format((float)$db_product['price'],3,',',' ').' '.$iso_code; // Get the price from the database
+        $main_product->description = $db_product['description']; // Get the description from the database
+        $main_product->id_product = $db_product['id_product'];
         $main_product->id_client_catalog = (int)$maincategory;
         if (!$main_product->add()) {
             $this->errors[] = $this->l('Failed to save client product');
@@ -432,6 +441,8 @@ class AdminClientproductsController extends ModuleAdminController
         $main_product = $this->loadObject();
         // Prepare the API requests array
         $apiRequests = [];
+        $currency = Currency::getDefaultCurrency();
+        $iso_code = $currency->iso_code; // Get the currency code
 
 
         // Prepare competitor requests
@@ -471,7 +482,7 @@ class AdminClientproductsController extends ModuleAdminController
                     $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$existing_product['id_competitor']);
                     $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$existing_product['id_competitor']);
 
-                    $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($competitor['url']);
+                    $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($competitor['url']);
                     if ($priceAttributes) {
                         $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
                     }
@@ -500,7 +511,7 @@ class AdminClientproductsController extends ModuleAdminController
                     $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$id_competitor);
                     $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$id_competitor);
 
-                    $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($competitor['url']);
+                    $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($competitor['url']);
                     if ($priceAttributes) {
                         $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
                     }
@@ -522,10 +533,16 @@ class AdminClientproductsController extends ModuleAdminController
         // Process main product result
         if ($main_product->name != Tools::getValue('search')) {
             $main_product->name = Tools::getValue('search');
-            $db_product = Db::getInstance()->getRow("SELECT * FROM " . _DB_PREFIX_ . "target_product WHERE name = '" . pSQL($main_product->name) . "'"); // Change the table name to your target product table
-            $main_product->url = $db_product['url']; // Get the URL from the database
-            $main_product->price = $db_product['price']; // Get the price from the database
-            $main_product->description = ''; //Get the description from the database
+            $db_product = Db::getInstance()->getRow("SELECT prl.name, prl.description, pr.id_product, pr.price, i.id_image 
+            FROM " . _DB_PREFIX_ . "product pr
+            LEFT JOIN " . _DB_PREFIX_ . "product_lang prl ON prl.id_product = pr.id_product 
+            LEFT JOIN " . _DB_PREFIX_ . "image i ON i.id_product = pr.id_product AND i.cover = 1
+            WHERE prl.name = '" . pSQL($main_product->name) . "'"); // Change the table name to your target product table
+//            $main_product->url = $db_product['url']; // Get the URL from the database
+            $main_product->price = number_format((float)$db_product['price'],3,',',' ').' '.$iso_code; // Get the price from the database
+            $main_product->description = $db_product['description']; //Get the description from the database
+            $main_product->id_product = $db_product['id_product']; // Get the product ID from the database
+            $main_product->img_url = Context::getContext()->link->getImageLink($db_product['name'],$db_product['id_image']); // Get the image URL from the database
             if (!$main_product->update()) {
                 $this->errors[] = $this->l('Failed to update client product');
                 return false;
@@ -700,7 +717,7 @@ class AdminClientproductsController extends ModuleAdminController
                 $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
                 $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
 
-                $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($cp['url']);
+                $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($cp['url']);
                 if ($priceAttributes) {
                     $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
                 }
@@ -808,7 +825,7 @@ class AdminClientproductsController extends ModuleAdminController
             $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
             $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
 
-            $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($cp['url']);
+            $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($cp['url']);
             if ($priceAttributes) {
                 $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
             }
@@ -876,7 +893,7 @@ class AdminClientproductsController extends ModuleAdminController
     {
         // Get all client products
         $products = Db::getInstance()->executeS('
-            SELECT id_product 
+            SELECT id_client_product 
             FROM `' . _DB_PREFIX_ . 'client_product`
         ');
 
@@ -891,7 +908,7 @@ class AdminClientproductsController extends ModuleAdminController
                 FROM `' . _DB_PREFIX_ . 'competitor_product` cp
                 INNER JOIN `' . _DB_PREFIX_ . 'products_relation` pr
                 ON cp.id_product = pr.id_product_competitor
-                WHERE pr.id_product_client = ' . (int)$product['id_product']
+                WHERE pr.id_product_client = ' . (int)$product['id_client_product']
             );
 
             // Prepare competitor API requests
@@ -901,7 +918,7 @@ class AdminClientproductsController extends ModuleAdminController
                 $descriptionAttributes = Db::getInstance()->getRow('SELECT description_tag AS tag, description_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
                 $stockAttributes = Db::getInstance()->getRow('SELECT stock_tag AS tag, stock_attribute AS attributes FROM `' . _DB_PREFIX_ . 'competitor_pattern` WHERE id_competitor = ' . (int)$cp['id_competitor']);
 
-                $apiUrl = 'http://localhost:8000/api/extract-price?url=' . urlencode($cp['url']);
+                $apiUrl = $this->apiConfig['api_base_url'].'/api/extract-price?url=' . urlencode($cp['url']);
                 if ($priceAttributes) {
                     $apiUrl .= '&param=' . urlencode(json_encode($priceAttributes));
                 }
@@ -1061,27 +1078,38 @@ class AdminClientproductsController extends ModuleAdminController
      * It retrieves the search query from the request,
      * queries the database for matching products,
      * and returns the results as a JSON response.
-     * !!!Change the query to match your database structure!!!!
      */
     public function ajaxProcessSearchTargetProducts()
     {
         $query = Tools::getValue('q');
         $html = '';
+        $currency = Currency::getDefaultCurrency();
+        $iso_code = $currency->iso_code; // Get the currency code
 
         if (strlen($query) >= 3) {
             $products = Db::getInstance()->executeS('
-            SELECT * 
-            FROM `' . _DB_PREFIX_ . 'target_product` 
-            WHERE name LIKE "%' . pSQL($query) . '%" 
-            LIMIT 10
-        ');
+                SELECT DISTINCT 
+                    prl.name, 
+                    pr.price,
+                    pr.id_product,
+                    i.id_image 
+                FROM `' . _DB_PREFIX_ . 'product` pr
+                LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` prl ON prl.id_product = pr.id_product
+                LEFT JOIN `' . _DB_PREFIX_ . 'image` i ON i.id_product = pr.id_product AND i.cover = 1
+                WHERE prl.name LIKE "%' . pSQL($query) . '%"
+                LIMIT 10
+            ');
 
             if ($products) {
+
                 foreach ($products as $product) {
-                    $html .= '<li class="search-item" data-url="' . htmlspecialchars($product['url']) . '">'
+                    $imageUrl = Image::getCover($product['id_product']) ?
+                        Context::getContext()->link->getImageLink($product['name'], $product['id_image']) :
+                        false; // Get the image URL from the database
+                    $html .= '<li class="search-item" data-url="' . htmlspecialchars($product['url']) . '" style="display: flex; align-items: center; gap: 8px;">'
+                        . ($imageUrl ? '<img src="' . $imageUrl . '" alt="' . htmlspecialchars($product['name']) . '" class="product-image" style="height:50px; width:50px; margin-left: -20px;">' : '')
                         . '<span class="product-name">' . htmlspecialchars($product['name']) . '</span>'
-                        . '<small class="text-muted"><strong>URL: </strong>' . htmlspecialchars($product['url']) . '</small><br>'
-                        . ' <small class="text-muted"><strong>Price: </strong>' . htmlspecialchars($product['price']) . '</small>'
+                        . '<small class="text-muted"><strong>Price: </strong>' . htmlspecialchars(number_format((float)$product['price'], 3, ',', ' ')) . " " . $iso_code . '</small>'
                         . '</li>';
                 }
             } else {

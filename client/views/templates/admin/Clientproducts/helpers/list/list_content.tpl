@@ -1,16 +1,17 @@
 {extends file="helpers/list/list_content.tpl"}
 
 <!---
-This template is used to display the content of the product list in the admin panel.
-It includes a table that shows the product details, including the product name, price, and stock status.
-The template also includes a section for displaying competitors' prices and stock status.
-The competitors' section can be expanded to show more competitors. ( Only shows the first competitor by default )
+This template displays the product list in the admin panel, including the product image shown on the client side.
+It features a table with product details such as name, price, and stock status.
+Additionally, it includes a section for competitors’ prices and stock availability.
+By default, only the first competitor is shown, but the section can be expanded to reveal more.
 -->
 
 {block name="td_content"}
+
     {if $key == 'competitors'}
         <div class="competitors-inline-list">
-            <table class="table competitors-table-{$tr.id_product}">
+            <table class="table competitors-table-{$tr.id_client_product}">
                 <thead>
                 <tr>
                     <th>Priority</th>
@@ -25,7 +26,7 @@ The competitors' section can be expanded to show more competitors. ( Only shows 
                 </tr>
                 </thead>
                 <tbody>
-                {assign var=competitors value=Products_relation::getProductRelations($tr.id_product)} {* Get competitors for the product *}
+                {assign var=competitors value=Products_relation::getProductRelations($tr.id_client_product)} {* Get competitors for the product *}
                 {assign var=activeCount value=0}
                 {if $competitors}
                     {foreach from=$competitors item=competitor name=compLoop}
@@ -277,6 +278,12 @@ The competitors' section can be expanded to show more competitors. ( Only shows 
 
             }
         </style>
+    {elseif $key == 'image'}
+            <div class="fixed-width-xs">
+                {if $tr.img_url}
+                <img src="{$tr.img_url}" alt="{$tr.name|escape:'html':'UTF-8'}" class="img-thumbnail" style="max-width: 50px; max-height: 50px;">
+                {/if}
+            </div>
     {else}
         {$smarty.block.parent}
     {/if}
