@@ -5,6 +5,7 @@ import json
 
 from flask import Flask, jsonify, request, session
 from compare import compare_product
+from test_similarity import test_comparing
 from target_compare import compare_tracking_product
 from Client_compare import compare_client_product
 from Client_tracking_compare import compare_client_tracking_product

@@ -231,15 +231,23 @@ class DOMExtractor:
                 description = element.get_text()# Extract the text content if the content attribute does not exist
         # Extract stock using the provided parameters
         if stock_param:
-            stock_param_ = json.loads(stock_param)# Load the stock parameters
+            stock_param_ = json.loads(stock_param)  # Load the stock parameters
             print(stock_param_)
-            attributes = json.loads(stock_param_['attributes'])# Load the attributes for stock extraction
-            element = soup.find(name=stock_param_['tag'], attrs=attributes)# Find elements with the specified tag and attributes
-            if (element.has_attr('content')):
-                stock = element['content']# Extract the content attribute if it exists
-            else:
-                stock = element.get_text() # Extract the text content if the content attribute does not exist
+            attributes = json.loads(stock_param_['attributes'])  # Load the attributes for stock extraction
+            if (attributes):
+                element = soup.find(name=stock_param_['tag'],
+                                    attrs=attributes)  # Find elements with the specified tag and attributes
 
+            else:
+                element = soup.find(
+                    lambda tag: tag.name == stock_param_['tag'] and
+                                any('stock' in str(value).lower() and 'stockage' not in str(value).lower()
+                                    for value in tag.attrs.values())
+                )
+            if (element.has_attr('content')):
+                stock = element['content']  # Extract the content attribute if it exists
+            else:
+                stock = element.get_text()  # Extract the text content if the content attribute does not exist
         return price, title, description, stock
 
 
